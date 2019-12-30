@@ -1,4 +1,4 @@
-module github.com/ansel1/merry
+module github.com/thanapolr/merry
 
 go 1.9
 
