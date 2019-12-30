@@ -141,3 +141,45 @@ func Details(e error) string {
 	}
 	return msg
 }
+
+// Details returns a map of e.Error(), e's stacktrace, and any additional details which have
+// be registered with RegisterDetail. User message and HTTP code are already registered.
+//
+// The details of each error in e's cause chain will also be printed.
+func DetailsMap(e error) map[string]interface{} {
+	m := make(map[string]interface{})
+
+	if e == nil { return m }
+	msg := Message(e)
+	m["msg"] = msg
+
+	detailsLock.Lock()
+
+	//var dets []string
+	for label, key := range detailFields {
+		v := Value(e, key)
+		if v != nil {
+			// remove redundant spaces
+			k := strings.Join(strings.Fields(strings.ToLower(label)), " ")
+			// to snake case
+			k = strings.ReplaceAll(s, " ", "_")
+			m[k] = v
+		}
+	}
+
+	detailsLock.Unlock()
+
+	//userMsg := UserMessage(e)
+	//if userMsg != "" {
+	//	msg = fmt.Sprintf("%s\n\nUser Message: %s", msg, userMsg)
+	//}
+	s := Stacktrace(e)
+	if s != "" {
+		m["stacktrace"] = s
+	}
+
+	if c := Cause(e); c != nil && c != e {
+		m["cause"] = DetailsMap(c)
+	}
+	return m
+}
