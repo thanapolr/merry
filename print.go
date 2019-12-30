@@ -162,7 +162,7 @@ func DetailsMap(e error) map[string]interface{} {
 			// remove redundant spaces
 			k := strings.Join(strings.Fields(strings.ToLower(label)), " ")
 			// to snake case
-			k = strings.ReplaceAll(s, " ", "_")
+			k = strings.ReplaceAll(k, " ", "_")
 			m[k] = v
 		}
 	}
